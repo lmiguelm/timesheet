@@ -1,6 +1,3 @@
-
 export default function Home() {
-  return (
-    <div>Timesheet</div>
-  )
+  return <div>Timesheet</div>;
 }
