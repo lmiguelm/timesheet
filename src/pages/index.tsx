@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div>Timesheet</div>;
+  return <h1 className="text-red-500">Timesheet</h1>;
 }
