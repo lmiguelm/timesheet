@@ -7,5 +7,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@headlessui/react'),
+    require('@heroicons/react/24/outline'),
+    require('@tailwindcss/forms'),
+  ],
 };
