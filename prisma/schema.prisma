@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id
+  name  String
+  email String @unique
+  image String
+
+  Timesheet Timesheet[]
+
+  @@map("users")
+}
+
+model Timesheet {
+  id    String   @id @default(uuid())
+  date  DateTime
+  total Decimal
+  tasks Task[]
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@map("timesheets")
+}
+
+model Task {
+  id                String   @id @default(uuid())
+  description       String
+  start             DateTime
+  end               DateTime
+  totalWithPause    Decimal @map("total_with_pause")
+  totalWithoutPause Decimal @map("total_without_pause")
+  totalPauses       Decimal @map("total_pauses")
+  pauses            Pause[]
+
+  Timesheet   Timesheet? @relation(fields: [timesheetId], references: [id])
+  timesheetId String?
+
+  @@map("tasks")
+}
+
+model Pause {
+  id    String   @id @default(uuid())
+  start DateTime
+  end   DateTime
+  total Decimal
+
+  Task   Task?   @relation(fields: [taskId], references: [id])
+  taskId String?
+
+  @@map("pauses")
+}
