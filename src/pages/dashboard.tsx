@@ -24,16 +24,6 @@ export default function Dashboard({ user }: DashboardProps) {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx);
 
-  if (!session) {
-    return {
-      props: {},
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-
   return {
     props: {
       user: session.user,
