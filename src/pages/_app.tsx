@@ -1,12 +1,16 @@
+import { SessionProvider } from 'next-auth/react';
+
 import { TimesheetProvider } from '../contexts/TimesheetContext';
 
 import '../styles/global.css';
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
-    <TimesheetProvider>
-      <Component {...pageProps} />
-    </TimesheetProvider>
+    <SessionProvider session={session}>
+      <TimesheetProvider>
+        <Component {...pageProps} />
+      </TimesheetProvider>
+    </SessionProvider>
   );
 }
 

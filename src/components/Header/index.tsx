@@ -1,26 +1,37 @@
 import { Disclosure } from '@headlessui/react';
+import { User } from 'next-auth';
+import { signOut } from 'next-auth/react';
 
 import { DesktopHeader } from './Desktop';
 import { MobileHeader } from './Mobile';
 
-const user = {
-  name: 'Luis Miguel',
-  email: 'luismiguelfernandes.marcelo@gmail.com',
-  imageUrl: 'https://github.com/lmiguelm.png',
+export type Navigation = {
+  name: string;
+  href: string;
+  current: boolean;
 };
 
-const navigation = [
+export type UserNavigation = {
+  name: string;
+  action: () => void;
+};
+
+const navigation: Navigation[] = [
   { name: 'Dashboard', href: '#', current: true },
   { name: 'Histórico', href: '#', current: false },
 ];
 
-const userNavigation = [{ name: 'Sair', href: '#' }];
+const userNavigation: UserNavigation[] = [{ name: 'Sair', action: signOut }];
 
 export function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export function Header() {
+type HeaderProps = {
+  user: User;
+};
+
+export function Header({ user }: HeaderProps) {
   return (
     <Disclosure as="nav" className="dark:bg-gray-800">
       {({ open }) => (

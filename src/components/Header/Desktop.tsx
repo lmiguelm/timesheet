@@ -2,10 +2,23 @@ import { Fragment } from 'react';
 
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, ClockIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { User } from 'next-auth';
 
-import { classNames } from '.';
+import { classNames, Navigation, UserNavigation } from '.';
 
-export function DesktopHeader({ open, navigation, user, userNavigation }) {
+export type DesktopHeaderProps = {
+  open: boolean;
+  navigation: Navigation[];
+  user: User;
+  userNavigation: UserNavigation[];
+};
+
+export function DesktopHeader({
+  open,
+  navigation,
+  user,
+  userNavigation,
+}: DesktopHeaderProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="flex h-16 items-center justify-between">
@@ -41,7 +54,7 @@ export function DesktopHeader({ open, navigation, user, userNavigation }) {
                   <span className="sr-only">Open user menu</span>
                   <img
                     className="h-8 w-8 rounded-full"
-                    src={user.imageUrl}
+                    src={user.image}
                     alt={user.name}
                   />
                   <span className="ml-2 text-gray-300">{user.name}</span>
@@ -61,7 +74,7 @@ export function DesktopHeader({ open, navigation, user, userNavigation }) {
                     <Menu.Item key={item.name}>
                       {({ active }) => (
                         <a
-                          href={item.href}
+                          onClick={item.action}
                           className={classNames(
                             active ? 'bg-gray-800' : '',
                             'block px-4 py-2 text-sm text-gray-300',
