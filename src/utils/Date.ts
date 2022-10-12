@@ -1,9 +1,15 @@
-import { formatDistanceStrict, parse } from 'date-fns';
+import { format, formatDistanceStrict, parse } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 export class DateUtils {
   public static parseHourToDate(dateString: string) {
-    return parse(dateString, 'k:m', new Date(), {
+    return parse(dateString, 'kk:mm', new Date(), {
+      locale: ptBR,
+    });
+  }
+
+  public static parseDateToHours(date: Date) {
+    return format(date, 'kk:mm', {
       locale: ptBR,
     });
   }

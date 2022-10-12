@@ -1,15 +1,16 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import uuid from 'react-uuid';
 
 import { Dialog, Transition } from '@headlessui/react';
 
+import { TaskData } from '../contexts/TimesheetContext';
 import { useTimesheet } from '../hooks/useTimesheet';
 import { DateUtils } from '../utils/Date';
 
-type CreateNewTaskModalProps = {
+type EditTaskModalProps = {
   isOpen: boolean;
-  onRequestCloseCreateNewTaskModal: () => void;
+  onRequestCloseEditTaskModal: () => void;
+  data: TaskData;
 };
 
 type FormData = {
@@ -18,44 +19,64 @@ type FormData = {
   endDate: string;
 };
 
-export function CreateNewTaskModal({
+export function EditTaskModal({
   isOpen,
-  onRequestCloseCreateNewTaskModal,
-}: CreateNewTaskModalProps) {
+  onRequestCloseEditTaskModal,
+  data: currentTask,
+}: EditTaskModalProps) {
   const cancelButtonRef = useRef(null);
 
-  const { handleSaveNewTask } = useTimesheet();
-  const { register, handleSubmit, reset } = useForm();
+  const { handleEditTask } = useTimesheet();
+
+  const { register, handleSubmit, reset, setValue } = useForm();
+
+  useEffect(() => {
+    setValue('taskDescription', currentTask?.description);
+
+    setValue(
+      'startDate',
+      currentTask?.startDate
+        ? DateUtils.parseDateToHours(currentTask?.startDate)
+        : null,
+    );
+
+    setValue(
+      'endDate',
+      currentTask?.endDate
+        ? DateUtils.parseDateToHours(currentTask?.endDate)
+        : null,
+    );
+  }, [currentTask, setValue]);
 
   async function submitForm(data: FormData) {
     const startDateParsed =
-      data.startDate !== ''
+      data.startDate && data.startDate !== ''
         ? DateUtils.parseHourToDate(data.startDate)
         : new Date();
 
     const endDateParsed =
-      data.endDate !== '' ? DateUtils.parseHourToDate(data.endDate) : null;
+      data.endDate && data.endDate !== ''
+        ? DateUtils.parseHourToDate(data.endDate)
+        : null;
 
-    await handleSaveNewTask({
-      id: uuid(),
+    await handleEditTask({
+      ...currentTask,
       startDate: startDateParsed,
       endDate: endDateParsed,
       description: data.taskDescription,
       status: data.endDate ? 'FINISHED' : 'IN_PROGRESS',
-      pauses: [],
-      totalPaused: 0,
       totalCompleted: endDateParsed
         ? DateUtils.parseSecondsToHours(startDateParsed, endDateParsed)
         : 0,
     });
 
-    onRequestCloseCreateNewTaskModal();
+    onRequestCloseEditTaskModal();
     reset();
   }
 
   function handleCloseModalAndResetData() {
     reset();
-    onRequestCloseCreateNewTaskModal();
+    onRequestCloseEditTaskModal();
   }
 
   return (
@@ -64,7 +85,7 @@ export function CreateNewTaskModal({
         as="div"
         className="relative z-10"
         initialFocus={cancelButtonRef}
-        onClose={onRequestCloseCreateNewTaskModal}
+        onClose={onRequestCloseEditTaskModal}
       >
         <Transition.Child
           as={Fragment}
@@ -92,7 +113,7 @@ export function CreateNewTaskModal({
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                 <div className="p-5 flex flex-col">
                   <h1 className="font-bold text-center uppercase text-white">
-                    Registro de tarefa
+                    Editando tarefa
                   </h1>
 
                   <form onSubmit={handleSubmit(submitForm)} className="pt-10">

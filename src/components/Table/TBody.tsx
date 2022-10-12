@@ -1,11 +1,11 @@
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { useTimesheet } from '../../hooks/useTimesheet';
 
 export function TBody() {
-  const { tasks, handleRemoveTask } = useTimesheet();
+  const { tasks, handleRemoveTask, handleOpenEditTaskModal } = useTimesheet();
 
   return (
     <tbody>
@@ -52,6 +52,13 @@ export function TBody() {
           </td>
 
           <td className="py-4 px-6 flex items-center justify-end">
+            <PencilIcon
+              width={16}
+              height={16}
+              className="text-yellow-500 cursor-pointer mr-5"
+              onClick={() => handleOpenEditTaskModal(task)}
+            />
+
             <TrashIcon
               width={16}
               height={16}

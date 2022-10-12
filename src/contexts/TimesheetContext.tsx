@@ -39,9 +39,12 @@ type TimesheetContextData = {
   handleFinishTaskInProgress: () => void;
   showCreateNewTaskModal: boolean;
   handleCloseCreateNewTaskModal: () => void;
+  handleCloseEditTaskModal: () => void;
   handleOpenCreateNewTaskModal: () => void;
+  handleOpenEditTaskModal: (task: TaskData) => void;
   handleInitPause: () => void;
   handleFinishPause: () => void;
+  showEditTaskModal: TaskData;
 };
 
 export const TimesheetContext = createContext({} as TimesheetContextData);
@@ -58,6 +61,7 @@ export function TimesheetProvider({ children }: TimesheetProps) {
   const [totalPaused, setTotalPaused] = useState<number>(0);
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] =
     useState<boolean>(false);
+  const [showEditTaskModal, setShowEditTaskModal] = useState<TaskData>(null);
 
   useEffect(() => {
     setHasTaskInProgress(tasks.some((task) => task.status === 'IN_PROGRESS'));
@@ -141,13 +145,21 @@ export function TimesheetProvider({ children }: TimesheetProps) {
     setShowCreateNewTaskModal(false);
   }, []);
 
+  const handleCloseEditTaskModal = useCallback(() => {
+    setShowEditTaskModal(null);
+  }, []);
+
   const handleOpenCreateNewTaskModal = useCallback(() => {
     setShowCreateNewTaskModal(true);
   }, []);
 
-  const handleEditTask = useCallback(async (task: TaskData) => {
+  const handleOpenEditTaskModal = useCallback((task: TaskData) => {
+    setShowEditTaskModal(task);
+  }, []);
+
+  const handleEditTask = useCallback(async (currentTask: TaskData) => {
     setTasks((oldstate) =>
-      oldstate.map((currentTask) => {
+      oldstate.map((task) => {
         if (task.id === currentTask.id) {
           return currentTask;
         }
@@ -194,6 +206,9 @@ export function TimesheetProvider({ children }: TimesheetProps) {
         handleInitPause,
         handleFinishPause,
         hasTaskPaused,
+        handleOpenEditTaskModal,
+        showEditTaskModal,
+        handleCloseEditTaskModal,
       }}
     >
       {children}
