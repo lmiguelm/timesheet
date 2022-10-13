@@ -1,4 +1,7 @@
 export const Environments = {
+  application: {
+    baseURL: process.env.BASE_URL,
+  },
   auth: {
     next: {
       secret: process.env.NEXTAUTH_SECRET,

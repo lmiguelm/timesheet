@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { User } from 'next-auth';
-import { getSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 
 import { Header } from '../components/Header';
 import { Table } from '../components/Table';
@@ -10,6 +10,9 @@ type DashboardProps = {
 };
 
 export default function Dashboard({ user }: DashboardProps) {
+  const { data } = useSession();
+  console.log(data);
+
   return (
     <div className="flex flex-col h-screen bg-red-500">
       <Header user={user} />
@@ -23,6 +26,16 @@ export default function Dashboard({ user }: DashboardProps) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx);
+
+  if (!session) {
+    return {
+      props: {},
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
