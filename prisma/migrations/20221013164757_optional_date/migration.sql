@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "pauses" ALTER COLUMN "start" DROP NOT NULL,
+ALTER COLUMN "end" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "tasks" ALTER COLUMN "start" DROP NOT NULL,
+ALTER COLUMN "end" DROP NOT NULL;

@@ -44,7 +44,7 @@ model User {
   id            String      @id @default(cuid())
   name          String?
   email         String?     @unique
-  emailVerified DateTime?
+  emailVerified DateTime?   @map("email_verified")
   image         String?
   accounts      Account[]
   sessions      Session[]
@@ -59,46 +59,53 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-
   @@map("verificaion_token")
 }
 
 model Timesheet {
   id    String   @id @default(uuid())
-  date  DateTime
-  total Decimal
+  createdAt  DateTime @default(now()) @db.Timestamptz @map("created_at")
+  total Float
   tasks Task[]
 
   user   User   @relation(fields: [userId], references: [id])
-  userId String
+  userId String @map("user_id")
 
   @@map("timesheets")
 }
 
+enum StatusTask {
+  OPEN
+  IN_PROGRESS
+  PAUSED
+  CLOSED
+}
+
 model Task {
-  id                String   @id @default(uuid())
+  id                String     @id @default(uuid())
   description       String
-  start             DateTime
-  end               DateTime
-  totalWithPause    Decimal  @map("total_with_pause")
-  totalWithoutPause Decimal  @map("total_without_pause")
-  totalPauses       Decimal  @map("total_pauses")
+  start             DateTime?  @db.Timestamptz
+  end               DateTime?  @db.Timestamptz
+  status            StatusTask @default(OPEN)
+  totalWithPause    Float      @map("total_with_pause")
+  totalWithoutPause Float      @map("total_without_pause")
+  totalPauses       Float      @map("total_pauses")
   pauses            Pause[]
 
   Timesheet   Timesheet? @relation(fields: [timesheetId], references: [id])
-  timesheetId String?
+  timesheetId String? @map("timesheet_id")
 
   @@map("tasks")
 }
 
 model Pause {
-  id    String   @id @default(uuid())
-  start DateTime
-  end   DateTime
-  total Decimal
+  id    String    @id @default(uuid())
+  start DateTime? @db.Timestamptz
+  end   DateTime? @db.Timestamptz
+  total Float
 
   Task   Task?   @relation(fields: [taskId], references: [id])
-  taskId String?
+  taskId String? @map("task_id")
 
   @@map("pauses")
 }
