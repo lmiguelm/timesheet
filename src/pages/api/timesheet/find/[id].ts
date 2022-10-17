@@ -10,11 +10,11 @@ export default async function handler(
   try {
     const { id } = req.query;
 
-    const session = await isAuthenticated(req);
+    await isAuthenticated(req);
 
     const service = new FindTimesheetByIdService();
 
-    const timesheets = await service.execute(id.toString(), session.userId);
+    const timesheets = await service.execute(id.toString());
 
     return res.status(201).json(timesheets);
   } catch (error) {
