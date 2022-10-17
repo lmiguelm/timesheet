@@ -16,6 +16,15 @@ export const authOptions: NextAuthOptions = {
   jwt: {
     secret: Environments.auth.next.secret,
   },
+  session: {
+    strategy: 'database',
+  },
+  callbacks: {
+    session({ session, user }) {
+      session.userId = user.id;
+      return session;
+    },
+  },
 };
 
 export default NextAuth(authOptions);
