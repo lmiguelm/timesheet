@@ -1,0 +1,90 @@
+@base_url = http://localhost:3000/api
+@timesheet_id = ec19fcad-d4f0-41ac-acd9-c2842ac88863
+@task_id = 555d4cbc-1f6a-4f48-8bbd-4c94de891f87
+@pause_id = 97fd81fe-79f9-4dfb-9554-3be41ef6fd55
+@session_token = next-auth.session-token=21e1ca5f-4747-416b-94e7-8638ca145a22
+
+###
+
+# @name CreateTimesheet
+POST {{base_url}}/timesheet/new HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+###
+
+# @name FindAllTimesheets
+GET {{base_url}}/timesheet/findAll HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+### 
+
+# @name FindTimesheetById
+GET {{base_url}}/timesheet/find/{{timesheet_id}} HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+###
+
+# @name FindOrCreateTimesheetByCreatedDate
+POST {{base_url}}/timesheet/findOrCreateByCreatedDate HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+###
+
+# @name CreateTask
+POST {{base_url}}/task/new HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+{
+  "timesheetId": "{{timesheet_id}}",
+  "description": "teste"
+}
+
+###
+
+# @name StartTask
+POST {{base_url}}/task/start HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+{
+  "taskId": "{{task_id}}"
+}
+
+###
+
+# @name FinishTask
+POST {{base_url}}/task/finish HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+{
+  "taskId": "{{task_id}}",
+  "end": "2022-10-15T20:00:05.721Z"
+}
+
+###
+
+# @name StartPause
+POST {{base_url}}/pause/start HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+{
+  "taskId": "{{task_id}}"
+}
+
+###
+
+# @name FinishPause
+POST {{base_url}}/pause/finish HTTP/1.1
+content-type: application/json
+Cookie: {{session_token}}
+
+{
+  "pauseId": "{{pause_id}}"
+}
