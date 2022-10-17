@@ -1,73 +1,134 @@
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
+import { useState } from 'react';
 
+import {
+  ForwardIcon,
+  MagnifyingGlassIcon,
+  PauseIcon,
+  PlayIcon,
+  // eslint-disable-next-line prettier/prettier, comma-dangle
+  StopIcon
+} from '@heroicons/react/24/solid';
+
+import { Task } from '../../contexts/@types/timesheet';
 import { useTimesheet } from '../../hooks/useTimesheet';
+import { DateUtils } from '../../utils/Date';
+import { TaskDetailModal } from '../TaskDetailModal';
 
 export function TBody() {
-  const { tasks, handleRemoveTask, handleOpenEditTaskModal } = useTimesheet();
+  const {
+    timesheet,
+    handleStartTask,
+    handleFinishTask,
+    handleStartPause,
+    handleFinishPause,
+  } = useTimesheet();
+
+  const [detailTaskModalIsOpen, setDetailTaskModalIsOpen] =
+    useState<boolean>(false);
+
+  const [selectedTask, setSelectedTask] = useState<Task>(null);
+
+  function handleDetailTask(task: Task) {
+    setSelectedTask(task);
+    setDetailTaskModalIsOpen(true);
+  }
 
   return (
-    <tbody>
-      {tasks.map((task) => (
-        <tr
-          key={task.id}
-          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-        >
-          <th
-            scope="row"
-            className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+    <>
+      <TaskDetailModal
+        task={selectedTask}
+        isOpen={detailTaskModalIsOpen}
+        onRequestCloseTaskDetailModal={() => setDetailTaskModalIsOpen(false)}
+      />
+
+      <tbody>
+        {timesheet.tasks.map((task) => (
+          <tr
+            key={task.id}
+            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 w-full"
           >
-            {task.description && task.description.includes('https://') ? (
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={task.description}
-              >
-                {task.description}
-              </a>
-            ) : task.description ? (
-              task.description
-            ) : (
-              'Nenhuma descrição informada'
-            )}
-          </th>
+            <th
+              scope="row"
+              className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              {task.description
+                ? task.description
+                : 'Nenhuma descrição informada'}
+            </th>
 
-          <td className="py-4 px-6">
-            {format(task.startDate, 'kk:mm', { locale: ptBR })}
-          </td>
+            <td className="py-4 px-6">
+              {task.start
+                ? DateUtils.formatDateToHours(new Date(task.start))
+                : '-'}
+            </td>
 
-          <td className="py-4 px-6">
-            {task.endDate
-              ? format(task.endDate, 'kk:mm', { locale: ptBR })
-              : '-'}
-          </td>
+            <td className="py-4 px-6">
+              {task.end ? DateUtils.formatDateToHours(new Date(task.end)) : '-'}
+            </td>
 
-          <td className="py-4 px-6">
-            {task.totalPaused ? `${task.totalPaused} Horas` : '-'}
-          </td>
+            <td className="py-4 px-6">
+              {task.totalPauses ? `${task.totalPauses} Horas` : '-'}
+            </td>
 
-          <td className="py-4 px-6">
-            {task.totalCompleted ? `${task.totalCompleted} Horas` : '-'}
-          </td>
+            <td className="py-4 px-6">
+              {task.totalWithPause ? `${task.totalWithPause} Horas` : '-'}
+            </td>
 
-          <td className="py-4 px-6 flex items-center justify-end">
-            <PencilIcon
-              width={16}
-              height={16}
-              className="text-yellow-500 cursor-pointer mr-5"
-              onClick={() => handleOpenEditTaskModal(task)}
-            />
+            <td className="py-4 px-6 flex items-center justify-end">
+              {task.status === 'OPEN' && (
+                <ForwardIcon
+                  width={16}
+                  height={16}
+                  className="text-green-500 cursor-pointer mr-5"
+                  onClick={() =>
+                    handleStartTask({ taskId: task.id, start: new Date() })
+                  }
+                />
+              )}
 
-            <TrashIcon
-              width={16}
-              height={16}
-              className="text-red-500 cursor-pointer"
-              onClick={() => handleRemoveTask(task.id)}
-            />
-          </td>
-        </tr>
-      ))}
-    </tbody>
+              {task.status === 'IN_PROGRESS' && (
+                <StopIcon
+                  width={16}
+                  height={16}
+                  className="text-red-500 cursor-pointer mr-5"
+                  onClick={() =>
+                    handleFinishTask({ taskId: task.id, end: new Date() })
+                  }
+                />
+              )}
+
+              {task.status === 'IN_PROGRESS' && (
+                <PauseIcon
+                  width={16}
+                  height={16}
+                  className="text-indigo-500 cursor-pointer mr-5"
+                  onClick={() => handleStartPause({ taskId: task.id })}
+                />
+              )}
+
+              {task.status === 'PAUSED' && (
+                <PlayIcon
+                  width={16}
+                  height={16}
+                  className="text-indigo-500 cursor-pointer mr-5"
+                  onClick={() =>
+                    handleFinishPause({
+                      pauseId: task.pauses.find((pause) => !pause.end).id,
+                    })
+                  }
+                />
+              )}
+
+              <MagnifyingGlassIcon
+                width={16}
+                height={16}
+                className="text-indigo-500 cursor-pointer mr-5"
+                onClick={() => handleDetailTask(task)}
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </>
   );
 }

@@ -3,14 +3,14 @@ import { useForm } from 'react-hook-form';
 
 import { Dialog, Transition } from '@headlessui/react';
 
-import { TaskData } from '../contexts/TimesheetContext';
+import { Task } from '../contexts/@types/timesheet';
 import { useTimesheet } from '../hooks/useTimesheet';
 import { DateUtils } from '../utils/Date';
 
 type EditTaskModalProps = {
   isOpen: boolean;
   onRequestCloseEditTaskModal: () => void;
-  data: TaskData;
+  data: Task;
 };
 
 type FormData = {
@@ -31,19 +31,21 @@ export function EditTaskModal({
   const { register, handleSubmit, reset, setValue } = useForm();
 
   useEffect(() => {
+    if (!currentTask) return;
+
     setValue('taskDescription', currentTask?.description);
 
     setValue(
       'startDate',
-      currentTask?.startDate
-        ? DateUtils.parseDateToHours(currentTask?.startDate)
+      currentTask.start
+        ? DateUtils.formatDateToHours(new Date(currentTask.start))
         : null,
     );
 
     setValue(
       'endDate',
-      currentTask?.endDate
-        ? DateUtils.parseDateToHours(currentTask?.endDate)
+      currentTask.end
+        ? DateUtils.formatDateToHours(new Date(currentTask.end))
         : null,
     );
   }, [currentTask, setValue]);
@@ -52,7 +54,7 @@ export function EditTaskModal({
     const startDateParsed =
       data.startDate && data.startDate !== ''
         ? DateUtils.parseHourToDate(data.startDate)
-        : new Date();
+        : null;
 
     const endDateParsed =
       data.endDate && data.endDate !== ''
@@ -60,14 +62,11 @@ export function EditTaskModal({
         : null;
 
     await handleEditTask({
-      ...currentTask,
-      startDate: startDateParsed,
-      endDate: endDateParsed,
-      description: data.taskDescription,
-      status: data.endDate ? 'FINISHED' : 'IN_PROGRESS',
-      totalCompleted: endDateParsed
-        ? DateUtils.parseSecondsToHours(startDateParsed, endDateParsed)
-        : 0,
+      taskId: currentTask.id,
+      timesheetId: currentTask.timesheetId,
+      description: data.taskDescription || currentTask.description,
+      start: startDateParsed || currentTask.start,
+      end: endDateParsed || currentTask.end,
     });
 
     onRequestCloseEditTaskModal();

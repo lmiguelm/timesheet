@@ -1,11 +1,11 @@
 import { Fragment, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import uuid from 'react-uuid';
 
 import { Dialog, Transition } from '@headlessui/react';
 
 import { useTimesheet } from '../hooks/useTimesheet';
 import { DateUtils } from '../utils/Date';
+import { Button } from './Button';
 
 type CreateNewTaskModalProps = {
   isOpen: boolean;
@@ -24,33 +24,21 @@ export function CreateNewTaskModal({
 }: CreateNewTaskModalProps) {
   const cancelButtonRef = useRef(null);
 
-  const { handleSaveNewTask } = useTimesheet();
+  const { handleCreateTask } = useTimesheet();
   const { register, handleSubmit, reset } = useForm();
 
   async function submitForm(data: FormData) {
-    const startDateParsed =
-      data.startDate !== ''
-        ? DateUtils.parseHourToDate(data.startDate)
-        : new Date();
-
-    const endDateParsed =
-      data.endDate !== '' ? DateUtils.parseHourToDate(data.endDate) : null;
-
-    await handleSaveNewTask({
-      id: uuid(),
-      startDate: startDateParsed,
-      endDate: endDateParsed,
+    await handleCreateTask({
+      start:
+        data.startDate !== ''
+          ? DateUtils.parseHourToDate(data.startDate)
+          : null,
+      end: data.endDate !== '' ? DateUtils.parseHourToDate(data.endDate) : null,
       description: data.taskDescription,
-      status: data.endDate ? 'FINISHED' : 'IN_PROGRESS',
-      pauses: [],
-      totalPaused: 0,
-      totalCompleted: endDateParsed
-        ? DateUtils.parseSecondsToHours(startDateParsed, endDateParsed)
-        : 0,
     });
 
-    onRequestCloseCreateNewTaskModal();
     reset();
+    onRequestCloseCreateNewTaskModal();
   }
 
   function handleCloseModalAndResetData() {
@@ -116,7 +104,7 @@ export function CreateNewTaskModal({
                         htmlFor="start-date"
                         className="block text-sm font-medium text-gray-100"
                       >
-                        Inicio (Caso não informado será utilizada a hora atual)
+                        Inicio (Opcional)
                       </label>
                       <input
                         {...register('startDate')}
@@ -132,7 +120,7 @@ export function CreateNewTaskModal({
                         htmlFor="end-date"
                         className="block text-sm font-medium text-gray-100"
                       >
-                        Fim (opcional)
+                        Fim (Opcional)
                       </label>
                       <input
                         {...register('endDate')}
@@ -143,45 +131,17 @@ export function CreateNewTaskModal({
                     </div>
 
                     <footer className="flex justify-end items-center gap-2 mt-10">
-                      <button
-                        className="
-                        text-white
-                        bg-red-500
-                        hover:bg-red-600
-                        hover:text-red-100
-                          px-3
-                          py-2
-                          rounded-md
-                          cursor-pointer
-                          transition-all
-                          font-bold
-                          text-sm
-                        "
+                      <Button
+                        colorName="red"
                         type="button"
                         onClick={handleCloseModalAndResetData}
                       >
                         Cancelar
-                      </button>
+                      </Button>
 
-                      <button
-                        onClick={handleSubmit(submitForm)}
-                        className="
-                        text-white
-                        bg-indigo-500
-                        hover:bg-indigo-600
-                        hover:text-indigo-100
-                          px-3
-                          py-2
-                          rounded-md
-                          cursor-pointer
-                          transition-all
-                          font-bold
-                          text-sm
-                        "
-                        type="submit"
-                      >
+                      <Button onClick={handleSubmit(submitForm)} type="submit">
                         Confirmar
-                      </button>
+                      </Button>
                     </footer>
                   </form>
                 </div>
