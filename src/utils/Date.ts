@@ -1,4 +1,4 @@
-import { format, formatDistanceStrict, parse } from 'date-fns';
+import { format, parse } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 export class DateUtils {
@@ -8,20 +8,20 @@ export class DateUtils {
     });
   }
 
-  public static parseDateToHours(date: Date) {
+  public static formatDateToHours(date: Date) {
     return format(date, 'kk:mm', {
       locale: ptBR,
     });
   }
 
-  public static parseSecondsToHours(startDate: Date, endDate: Date): number {
-    return +Number(
-      +formatDistanceStrict(startDate, endDate, {
-        locale: ptBR,
-        unit: 'second',
-      }).split(' ')[0] /
-        60 /
-        60,
-    ).toFixed(2);
+  public static getDistanceBetweenDatesInHours(
+    startDate: Date,
+    endDate: Date,
+  ): number {
+    const diff = Math.abs(endDate.getTime() - startDate.getTime());
+    const diffHours = diff / (1000 * 3600);
+    const diffHoursFormated = +diffHours.toFixed(2);
+
+    return diffHoursFormated;
   }
 }
