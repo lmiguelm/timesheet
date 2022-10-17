@@ -60,9 +60,9 @@ export class FinishTaskService {
       task.status = 'CLOSED';
 
       // atualizando total timesheet
-      const updateTotalTimesheet = new SumTotalTimesheetService();
+      const sumTotalTimesheet = new SumTotalTimesheetService();
 
-      await updateTotalTimesheet.execute({
+      await sumTotalTimesheet.execute({
         timesheetId: task.timesheetId,
         total: totalWithPause,
       });

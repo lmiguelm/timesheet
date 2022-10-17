@@ -1,6 +1,7 @@
 import { PrismaClient, StatusTask } from '@prisma/client';
 
 import { DateUtils } from '../../utils/Date';
+import { SumTotalTimesheetService } from '../timesheet/SumTotalTimesheet.service';
 
 type CreateTaskProps = {
   start?: Date;
@@ -26,6 +27,15 @@ export class CreateTaskService {
         : taskStarted
         ? 'IN_PROGRESS'
         : 'OPEN';
+
+      if (status === 'CLOSED') {
+        const sumTotalTimesheet = new SumTotalTimesheetService();
+
+        await sumTotalTimesheet.execute({
+          timesheetId: task.timesheetId,
+          total,
+        });
+      }
 
       return await prisma.task.create({
         data: {

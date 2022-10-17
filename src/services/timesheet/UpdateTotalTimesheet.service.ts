@@ -19,7 +19,7 @@ export class UpdateTotalTimesheetService {
       return await prisma.timesheet.update({
         where: { id: timesheetId },
         data: {
-          total: +total.toFixed(2),
+          total: total < 0 ? 0 : +total.toFixed(2),
         },
       });
     } catch (error) {
