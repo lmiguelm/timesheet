@@ -1,7 +1,6 @@
 import { PrismaClient, Task } from '@prisma/client';
 
 import { DateUtils } from '../../utils/Date';
-import { FindAllPausesService } from '../pause/FindAllPauses.service';
 import { SumTotalTimesheetService } from '../timesheet/SumTotalTimesheet.service';
 
 type FinishTaskProps = {
@@ -31,40 +30,27 @@ export class FinishTaskService {
       // validando
       this.validation(task);
 
-      // buscando pauses
-      const findAllPausesService = new FindAllPausesService();
-      const pauses = await findAllPausesService.execute(taskId);
-
-      // total de tempo pausado
-      const totalPaused = pauses
-        ? pauses.reduce((prev, { total }) => prev + total, 0)
-        : 0;
-
       // data da tarefa finalizada
-      const endDate = end ?? new Date();
+      task.end = end ?? new Date();
 
       // total de hrs sem as pausas
-      const totalWithoutPause = DateUtils.getDistanceBetweenDatesInHours(
+      task.totalWithoutPause = DateUtils.getDistanceBetweenDatesInHours(
         task.start,
-        endDate,
+        task.end,
       );
 
       // total de hrs com as pausas
-      const totalWithPause = totalWithoutPause - totalPaused;
+      task.totalWithPause = task.totalWithoutPause - task.totalPauses;
 
-      // atualizando task
-      task.end = endDate;
-      task.totalPauses = totalPaused;
-      task.totalWithPause = totalWithPause;
-      task.totalWithoutPause = totalWithoutPause;
+      // atualizando status
       task.status = 'CLOSED';
 
       // atualizando total timesheet
-      const sumTotalTimesheet = new SumTotalTimesheetService();
+      const updateTotalTimesheet = new SumTotalTimesheetService();
 
-      await sumTotalTimesheet.execute({
+      await updateTotalTimesheet.execute({
         timesheetId: task.timesheetId,
-        total: totalWithPause,
+        total: task.totalWithPause,
       });
 
       // atualizando e retornando

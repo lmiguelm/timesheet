@@ -1,6 +1,7 @@
-import { PrismaClient, StatusTask } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 import { DateUtils } from '../../utils/Date';
+import { getTaskStatus } from '../../utils/task';
 import { FindTimesheetByIdService } from '../timesheet/FindTimesheetById.service';
 import { UpdateTotalTimesheetService } from '../timesheet/UpdateTotalTimesheet.service';
 import { FindTaskByIdService } from './FindTaskById.service';
@@ -17,25 +18,20 @@ export class UpdateTaskService {
     const prisma = new PrismaClient();
 
     try {
+      // buscando tarefa
       const findTaskByIdService = new FindTaskByIdService();
       const taskAlreadyExists = await findTaskByIdService.execute(taskId);
 
       if (!taskAlreadyExists) throw new Error('Tarefa não encontrada.');
 
-      const taskStarted = !!data.start;
-      const taskClosed = taskStarted && !!data.end;
-
-      const total = taskClosed
+      // total copmpleto
+      const total = data.end
         ? DateUtils.getDistanceBetweenDatesInHours(data.start, data.end)
         : 0;
 
       const totalWithPause = total - taskAlreadyExists.totalPauses;
 
-      const status: StatusTask = taskClosed
-        ? 'CLOSED'
-        : taskStarted
-        ? 'IN_PROGRESS'
-        : 'OPEN';
+      const status = getTaskStatus(!!data.start, !!data.end);
 
       if (status === 'CLOSED') {
         const findTimesheetById = new FindTimesheetByIdService();
