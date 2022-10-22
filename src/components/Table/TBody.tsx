@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReactTooltip from 'react-tooltip';
 
 import {
   ForwardIcon,
@@ -35,6 +36,8 @@ export function TBody() {
 
   return (
     <>
+      <ReactTooltip />
+
       <TaskDetailModal
         task={selectedTask}
         isOpen={detailTaskModalIsOpen}
@@ -76,55 +79,65 @@ export function TBody() {
 
             <td className="py-4 px-6 flex items-center justify-end">
               {task.status === 'OPEN' && (
-                <ForwardIcon
-                  width={16}
-                  height={16}
-                  className="text-green-500 cursor-pointer mr-5"
-                  onClick={() =>
-                    handleStartTask({ taskId: task.id, start: new Date() })
-                  }
-                />
+                <span title="Iniciar">
+                  <ForwardIcon
+                    width={16}
+                    height={16}
+                    className="text-green-500 cursor-pointer mr-5"
+                    onClick={() =>
+                      handleStartTask({ taskId: task.id, start: new Date() })
+                    }
+                  />
+                </span>
               )}
 
               {task.status === 'IN_PROGRESS' && (
-                <StopIcon
-                  width={16}
-                  height={16}
-                  className="text-red-500 cursor-pointer mr-5"
-                  onClick={() =>
-                    handleFinishTask({ taskId: task.id, end: new Date() })
-                  }
-                />
+                <span title="Finalizar">
+                  <StopIcon
+                    width={16}
+                    height={16}
+                    className="text-red-500 cursor-pointer mr-5"
+                    onClick={() =>
+                      handleFinishTask({ taskId: task.id, end: new Date() })
+                    }
+                  />
+                </span>
               )}
 
               {task.status === 'IN_PROGRESS' && (
-                <PauseIcon
-                  width={16}
-                  height={16}
-                  className="text-indigo-500 cursor-pointer mr-5"
-                  onClick={() => handleStartPause({ taskId: task.id })}
-                />
+                <span title="Pausar">
+                  <PauseIcon
+                    width={16}
+                    height={16}
+                    className="text-indigo-500 cursor-pointer mr-5"
+                    onClick={() => handleStartPause({ taskId: task.id })}
+                  />
+                </span>
               )}
 
               {task.status === 'PAUSED' && (
-                <PlayIcon
+                <span title="Retomar">
+                  <PlayIcon
+                    width={16}
+                    height={16}
+                    className="text-indigo-500 cursor-pointer mr-5"
+                    onClick={() =>
+                      handleFinishPause({
+                        pauseId: task.pauses.find((pause) => !pause.end).id,
+                      })
+                    }
+                  />
+                </span>
+              )}
+
+              <span title="Detalhe">
+                <MagnifyingGlassIcon
                   width={16}
                   height={16}
                   className="text-indigo-500 cursor-pointer mr-5"
-                  onClick={() =>
-                    handleFinishPause({
-                      pauseId: task.pauses.find((pause) => !pause.end).id,
-                    })
-                  }
+                  onClick={() => handleDetailTask(task)}
                 />
-              )}
-
-              <MagnifyingGlassIcon
-                width={16}
-                height={16}
-                className="text-indigo-500 cursor-pointer mr-5"
-                onClick={() => handleDetailTask(task)}
-              />
+              </span>
             </td>
           </tr>
         ))}
