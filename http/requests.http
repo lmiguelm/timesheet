@@ -2,7 +2,7 @@
 @timesheet_id = ec19fcad-d4f0-41ac-acd9-c2842ac88863
 @task_id = 555d4cbc-1f6a-4f48-8bbd-4c94de891f87
 @pause_id = 97fd81fe-79f9-4dfb-9554-3be41ef6fd55
-@session_token = next-auth.session-token=21e1ca5f-4747-416b-94e7-8638ca145a22
+@session_token = next-auth.session-token=0e6e95f4-5c78-4605-a28f-bdc1ed56a756
 
 ###
 

@@ -3,21 +3,16 @@ import { User } from 'next-auth';
 import { getSession } from 'next-auth/react';
 
 import { Header } from '../components/Header';
-import { Table } from '../components/Table';
 import { getServerSideRedirect } from '../utils/auth';
 
-type DashboardProps = {
+type HistoryProps = {
   user: User;
 };
 
-export default function Dashboard({ user }: DashboardProps) {
+export default function History({ user }: HistoryProps) {
   return (
-    <div className="flex flex-col h-screen">
+    <div className="bg-black h-screen">
       <Header user={user} />
-
-      <main className="flex flex-1 flex-col justify-center items-center bg-black m-30">
-        <Table />
-      </main>
     </div>
   );
 }
